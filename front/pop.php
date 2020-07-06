@@ -6,7 +6,7 @@
         color: #FFF;
         min-height: 100px;
         width: 500px;
-height:400px;
+        height: 400px;
 
         position: fixed;
         display: none;
@@ -38,7 +38,7 @@ height:400px;
         // echo $now;
         $start = ($now - 1) * $div;
 
-        $rows = $db->all("", " ORDER BY good DESC LIMIT $start,$div");
+        $rows = $db->all(['sh' => 1], " ORDER BY good DESC LIMIT $start,$div");
         foreach ($rows as $row) {
         ?>
             <tr>

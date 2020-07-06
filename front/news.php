@@ -28,7 +28,7 @@
         $now = $_GET['p'] ?? "1";
         $start = ($now - 1) * $div;
 
-        $rows = $db->all("", " LIMIT $start,$div");
+        $rows = $db->all(['sh'=>1], " LIMIT $start,$div");
         foreach ($rows as $row) {
         ?>
             <tr>
