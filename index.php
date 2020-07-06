@@ -22,7 +22,7 @@
 			<?= date("m 月 d 日 l"); ?>
 			| 今日瀏覽:
 			<?=
-				$todayVisited['total']; ?>
+				$todayVisited['total']??"1"; ?>
 			| 累積瀏覽:
 			<?= $sumVisited; ?>
 			<a href="index.php" style="float:right">回首頁</a>

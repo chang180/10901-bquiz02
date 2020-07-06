@@ -21,7 +21,7 @@ class DB
             $sql .= " WHERE " . implode(" && ", $tmp);
         }
         $sql .= $arg[1] ?? '';
-        return $this->pdo->query($sql)->fetchAll();
+        return @$this->pdo->query($sql)->fetchAll();
     }
 
     public function del($arg)
@@ -41,17 +41,19 @@ class DB
             foreach ($arg as $k => $v) $tmp[] = "`$k`='$v'";
             $sql .= " WHERE " . implode(" && ", $tmp);
         } else $sql .= " WHERE `id`='$arg'";
+        // echo $sql;
         return $this->pdo->query($sql)->fetch(PDO::FETCH_ASSOC);
     }
 
     public function count(...$arg)
     {
         $sql = "SELECT COUNT(*) FROM $this->table ";
-        if (is_array($arg[0])) {
+        if (!empty($arg[0]) && is_array($arg[0])) {
             foreach ($arg[0] as $k => $v) $tmp[] = "`$k`='$v'";
             $sql .= " WHERE " . implode(" && ", $tmp);
         }
         $sql .= $arg[1] ?? '';
+        // echo $sql;
         return $this->pdo->query($sql)->fetchColumn();
     }
 
@@ -78,28 +80,25 @@ function to($url)
 
 $Total = new DB('total');
 $todayVisited = $Total->find(['date' => date("Y-m-d")]);
-$sumVisited=$Total->q("SELECT SUM(total) FROM total")[0]['SUM(total)']; //q()會回傳二維陣列，因為是fetchAll();
+$sumVisited = $Total->q("SELECT SUM(total) FROM total")[0]['SUM(total)']; //q()會回傳二維陣列，因為是fetchAll();
 // var_dump($Total->q("SELECT SUM(total) FROM total"));
 // print_r($sumVisited);
 // $sumVisited=$Total->q("select sum(`total`) from `total`")[0][0];
 
 // 判斷瀏覽人次
 $chk = $Total->find(['date' => date("Y-m-d")]);
-if(empty($chk) && empty($_SESSION['visited'])){
-//沒有今天的資料，也沒有session ， 今天頭香，需要新增今日資料，也要加1
-$Total->save(['date'=>date("Y-m-d"),'total'=>1]);
-$_SESSION['visited']=1;
-
-}else if(empty($chk) && !empty($_SESSION['visited'])){
-//沒有今天的資料，但是有session ，異常情形，需要新增今日資料
-$Total->save(['date'=>date("Y-m-d")]);
-
-}else if(!empty($chk) && empty($_SESSION['visited'])){
-//有今天的資料，但沒有session , 表示是新來 需要加1
-$chk['total']++;
-$Total->save($chk);
-$_SESSION['visited']=1;
-
+if (empty($chk) && empty($_SESSION['visited'])) {
+    //沒有今天的資料，也沒有session ， 今天頭香，需要新增今日資料，也要加1
+    $Total->save(['date' => date("Y-m-d"), 'total' => 1]);
+    $_SESSION['visited'] = 1;
+} else if (empty($chk) && !empty($_SESSION['visited'])) {
+    //沒有今天的資料，但是有session ，異常情形，需要新增今日資料
+    $Total->save(['date' => date("Y-m-d")]);
+} else if (!empty($chk) && empty($_SESSION['visited'])) {
+    //有今天的資料，但沒有session , 表示是新來 需要加1
+    $chk['total']++;
+    $Total->save($chk);
+    $_SESSION['visited'] = 1;
 }
 // else{
 // //有今天的資料，也有session
